@@ -42,8 +42,12 @@ export async function POST(req: NextRequest, props: Params) {
         ];
         
         // Agendaris also allowed to upload final scan during initial creation
-        if (user.role === "AGENDARIS" && doc.currentStatus === "MENUNGGU_REVIEW_AGENDARIS") {
-          allowedFinalScanStatuses.push("MENUNGGU_REVIEW_AGENDARIS");
+        if (user.role === "AGENDARIS") {
+          allowedFinalScanStatuses.push(
+            "MENUNGGU_REVIEW_AGENDARIS",
+            "MENUNGGU_KEPUTUSAN_DIREKTUR",
+            "MENUNGGU_ARSIP_ADMIN"
+          );
         }
 
         if (!allowedFinalScanStatuses.includes(doc.currentStatus)) {
