@@ -785,6 +785,7 @@ export function AgendarisActionPanel({
             </>
           )}
         </div>
+      </div>
     );
   }
 
