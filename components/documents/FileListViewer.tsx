@@ -82,6 +82,27 @@ export function FileListViewer({ files, title, emptyMessage = "Tidak ada file te
         fileUrl={previewFile?.url || ""}
         fileName={previewFile?.name || ""}
       />
+
+      {/* Embedded PDF Viewer for the first FINAL_SCAN or any PDF */}
+      {files.map((file) => {
+        const isPdf = file.fileName.toLowerCase().endsWith(".pdf") || file.fileType.toLowerCase().includes("pdf") || file.filePath.toLowerCase().endsWith(".pdf");
+        if (isPdf) {
+          return (
+            <div key={`embed-${file.id}`} className="mt-4 border border-gray-200 dark:border-slate-700 rounded-lg overflow-hidden h-[600px] w-full">
+              <div className="bg-gray-100 dark:bg-slate-800 p-2 text-xs font-semibold text-gray-500 border-b border-gray-200 dark:border-slate-700 flex justify-between items-center">
+                <span>Preview: {file.fileName}</span>
+                <a href={file.filePath} target="_blank" rel="noreferrer" className="text-blue-500 hover:underline">Buka Penuh</a>
+              </div>
+              <iframe 
+                src={file.filePath} 
+                className="w-full h-full border-none bg-gray-50 dark:bg-slate-900" 
+                title={file.fileName}
+              />
+            </div>
+          );
+        }
+        return null;
+      }).filter(Boolean)[0] /* Only show the first PDF inline to avoid clutter */}
     </div>
   );
 }

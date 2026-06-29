@@ -277,33 +277,6 @@ export function AgendarisActionPanel({
               </div>
             </button>
 
-            <button
-              onClick={() => setMode("disposisi_masuk")}
-              className="relative flex flex-col items-center justify-center p-6 gap-3 rounded-2xl border-2 border-blue-100 dark:border-blue-900/50 bg-gradient-to-b from-blue-50 dark:from-blue-900/20 to-white dark:to-slate-900 text-blue-800 dark:text-blue-300 shadow-sm hover:border-blue-500 hover:shadow-md hover:-translate-y-1 transition-all duration-200 overflow-hidden group"
-            >
-              <div className="absolute inset-0 bg-blue-500 opacity-0 group-hover:opacity-5 transition-opacity" />
-              <div className="w-12 h-12 flex items-center justify-center rounded-full bg-blue-100 text-blue-600 group-hover:scale-110 group-hover:bg-blue-500 group-hover:text-white shadow-sm transition-all duration-300">
-                <GitBranch className="w-6 h-6" />
-              </div>
-              <div className="text-center">
-                <div className="font-bold text-sm mb-1">Disposisi Surat Masuk</div>
-                <div className="text-xs text-blue-600/80">Lembar surat masuk</div>
-              </div>
-            </button>
-
-            <button
-              onClick={() => setMode("disposisi_undangan")}
-              className="relative flex flex-col items-center justify-center p-6 gap-3 rounded-2xl border-2 border-purple-100 dark:border-purple-900/50 bg-gradient-to-b from-purple-50 dark:from-purple-900/20 to-white dark:to-slate-900 text-purple-800 dark:text-purple-300 shadow-sm hover:border-purple-500 hover:shadow-md hover:-translate-y-1 transition-all duration-200 overflow-hidden group"
-            >
-              <div className="absolute inset-0 bg-purple-500 opacity-0 group-hover:opacity-5 transition-opacity" />
-              <div className="w-12 h-12 flex items-center justify-center rounded-full bg-purple-100 text-purple-600 group-hover:scale-110 group-hover:bg-purple-500 group-hover:text-white shadow-sm transition-all duration-300">
-                <GitBranch className="w-6 h-6" />
-              </div>
-              <div className="text-center">
-                <div className="font-bold text-sm mb-1">Disposisi Undangan</div>
-                <div className="text-xs text-purple-600/80">Lembar surat undangan</div>
-              </div>
-            </button>
           </div>
         )}
 
