@@ -2,12 +2,12 @@
  * @file lib/upload.ts
  * @description Modul untuk menangani validasi dan penyimpanan file upload.
  * Mendukung pembatasan tipe file (PDF, JPG, PNG) dan ukuran maksimum (20MB), 
- * serta menghasilkan nama file unik untuk penyimpanan di folder public/uploads.
+ * serta menghasilkan nama file unik untuk penyimpanan di Supabase Storage.
  */
 // lib/upload.ts
 import path from "path";
-import fs from "fs/promises";
 import { v4 as uuidv4 } from "uuid";
+import { supabase, STORAGE_BUCKET } from "./supabase";
 
 const ALLOWED_MIME = [
   "application/pdf",
@@ -60,16 +60,29 @@ export async function saveUploadedFile(
 
   const ext = path.extname(originalName) || mimeTypeToExt(type.mime);
   const uniqueName = `${uuidv4()}${ext}`;
-  const uploadDir = path.join(process.cwd(), "private_storage", "uploads", subDir);
+  const storagePath = `${subDir}/${uniqueName}`;
 
-  await fs.mkdir(uploadDir, { recursive: true });
+  // Upload ke Supabase Storage
+  const { error } = await supabase.storage
+    .from(STORAGE_BUCKET)
+    .upload(storagePath, buffer, {
+      contentType: type.mime,
+      upsert: false,
+    });
 
-  const fullPath = path.join(uploadDir, uniqueName);
-  await fs.writeFile(fullPath, buffer);
+  if (error) {
+    console.error("[Supabase Storage Upload Error]", error);
+    throw new Error(`Gagal mengupload file ke storage: ${error.message}`);
+  }
+
+  // Dapatkan public URL
+  const { data: urlData } = supabase.storage
+    .from(STORAGE_BUCKET)
+    .getPublicUrl(storagePath);
 
   return {
     fileName: originalName,
-    filePath: `/api/documents/download/${subDir}/${uniqueName}`,
+    filePath: urlData.publicUrl,
     fileSize: buffer.length,
     mimeType: type.mime,
   };
