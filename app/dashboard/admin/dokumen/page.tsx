@@ -15,7 +15,6 @@ const PAGE_SIZE = 15;
 
 // Tab configuration with icons and colors
 const TABS: { key: string; label: string; icon: string; documentType?: DocumentType; color: string; darkColor: string }[] = [
-  { key: "SEMUA",             label: "Semua",              icon: "layers",                                       color: "bg-blue-600",    darkColor: "dark:bg-blue-500" },
   { key: "SURAT_MASUK",       label: "Surat Masuk",        icon: "mailopen", documentType: "SURAT_MASUK",        color: "bg-blue-600",    darkColor: "dark:bg-blue-500" },
   { key: "UNDANGAN",          label: "Undangan",           icon: "calendar", documentType: "UNDANGAN",           color: "bg-purple-600",  darkColor: "dark:bg-purple-500" },
 ];
@@ -30,7 +29,7 @@ export default async function AdminSemuaDokumenPage(props: Params) {
   const q = searchParams.q ?? "";
   const date = searchParams.date ?? "";
   const page = Math.max(1, parseInt(searchParams.page ?? "1") || 1);
-  const activeType = searchParams.type ?? "SEMUA";
+  const activeType = searchParams.type ?? "SURAT_MASUK";
 
   const where: Prisma.SuratMasukWhereInput = {
     currentStatus: { not: "ARSIP_FINAL_TERSIMPAN" }
@@ -84,10 +83,9 @@ export default async function AdminSemuaDokumenPage(props: Params) {
   const totalPages = Math.ceil(totalItems / PAGE_SIZE);
 
   // Build count map
-  const countMap: Record<string, number> = { SEMUA: 0 };
+  const countMap: Record<string, number> = {};
   typeCounts.forEach((tc) => {
     countMap[tc.documentType] = tc._count.id;
-    countMap.SEMUA = (countMap.SEMUA ?? 0) + tc._count.id;
   });
 
   // Build search params string without type and page
@@ -204,7 +202,7 @@ export default async function AdminSemuaDokumenPage(props: Params) {
         <div className="px-5 py-4 border-b border-gray-100 dark:border-slate-800 flex items-center justify-between">
           <div>
             <h2 className="font-semibold text-gray-900 dark:text-white">
-              {activeTab?.label ?? "Semua"} 
+              {activeTab?.label ?? "Dokumen"} 
               <span className="text-gray-400 dark:text-slate-500 font-normal ml-2">({totalItems} dokumen)</span>
             </h2>
           </div>
@@ -214,7 +212,7 @@ export default async function AdminSemuaDokumenPage(props: Params) {
             documents={documents}
             basePath="/dashboard/admin"
             showCreator={true}
-            showDocType={activeType === "SEMUA"}
+            showDocType={false}
             emptyTitle={q || date ? "Pencarian tidak ditemukan" : "Tidak ada dokumen"}
             emptyDesc={
               q || date

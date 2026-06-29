@@ -755,24 +755,48 @@ export function AgendarisActionPanel({
             ? "Direktur sudah membuka dokumen ini, menunggu keputusannya."
             : "Dokumen saat ini berada di meja Direktur menunggu keputusan."}
         </p>
-        <button
-          onClick={async () => {
-            setLoading(true);
-            try {
-              const res = await fetch(`/api/documents/${doc.id}/remind-director`, { method: "POST" });
-              const json = await res.json();
-              if (!res.ok) throw new Error(json.error ?? "Gagal");
-              toast.success("Pengingat berhasil dikirim ke Direktur!");
-              router.refresh();
-            } catch (e: unknown) {
-              toast.error(e instanceof Error ? e.message : "Gagal");
-            } finally { setLoading(false); }
-          }}
-          disabled={loading}
-          className="btn-primary w-full justify-center bg-yellow-600 hover:bg-yellow-700 text-white"
-        >
-          {loading ? "Mengirim..." : "Ingatkan Direktur Sekarang"}
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={async () => {
+              setLoading(true);
+              try {
+                const res = await fetch(`/api/documents/${doc.id}/remind-director`, { method: "POST" });
+                const json = await res.json();
+                if (!res.ok) throw new Error(json.error ?? "Gagal");
+                toast.success("Pengingat berhasil dikirim ke Direktur!");
+                router.refresh();
+              } catch (e: unknown) {
+                toast.error(e instanceof Error ? e.message : "Gagal");
+              } finally { setLoading(false); }
+            }}
+            disabled={loading}
+            className="btn-primary flex-1 justify-center bg-yellow-600 hover:bg-yellow-700 text-white"
+          >
+            {loading ? "Mengirim..." : "Ingatkan Direktur"}
+          </button>
+          
+          {doc.currentStatus === "MENUNGGU_KEPUTUSAN_DIREKTUR" && (
+            <button
+              onClick={async () => {
+                if (!confirm("Yakin ingin menarik dokumen ini? Direktur tidak akan bisa memprosesnya sampai Anda meneruskannya kembali.")) return;
+                setLoading(true);
+                try {
+                  const res = await fetch(`/api/documents/${doc.id}/pullback`, { method: "POST" });
+                  const json = await res.json();
+                  if (!res.ok) throw new Error(json.error ?? "Gagal");
+                  toast.success("Dokumen berhasil ditarik!");
+                  router.refresh();
+                } catch (e: unknown) {
+                  toast.error(e instanceof Error ? e.message : "Gagal menarik dokumen");
+                } finally { setLoading(false); }
+              }}
+              disabled={loading}
+              className="btn-secondary flex-1 justify-center text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+            >
+              <RotateCcw className="w-4 h-4 mr-1" /> Tarik Dokumen
+            </button>
+          )}
+        </div>
       </div>
     );
   }

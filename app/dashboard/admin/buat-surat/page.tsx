@@ -128,10 +128,14 @@ function BuatSuratContent() {
     if (!createdDocId) return;
     setSubmitting(true);
     try {
-      // Actually Agendaris already created the doc and it's MENUNGGU_REVIEW_AGENDARIS.
-      // So this "Proses Dokumen" is just redirecting them back to dashboard, 
-      // or calling a submit API if needed. Since it's already created, 
-      // they just want to go back to dashboard.
+      const res = await fetch(`/api/documents/${createdDocId}/review`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reviewStatus: "DITERUSKAN", reviewNote: "Dokumen diteruskan oleh Agendaris" }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? "Gagal meneruskan dokumen.");
+
       toast.success("Dokumen siap diproses oleh Direktur");
       router.push(`/dashboard/admin/arsip/${createdDocId}`);
     } catch (err: unknown) {

@@ -113,15 +113,13 @@ export async function POST(req: NextRequest) {
         return errorResponse(`Nomor surat "${nomorSurat}" sudah ada dalam sistem.`, 409);
       }
 
-      // Agendaris membuat surat: langsung status MENUNGGU_KEPUTUSAN_DIREKTUR
+      // Agendaris membuat surat: status MENUNGGU_REVIEW_AGENDARIS dulu (menunggu file dan disubmit)
       // Staff membuat surat: status DRAFT
       const initialStatus = user.role === "AGENDARIS" 
-        ? "MENUNGGU_KEPUTUSAN_DIREKTUR" 
+        ? "MENUNGGU_REVIEW_AGENDARIS" 
         : "DRAFT";
 
-      const initialHolder = user.role === "AGENDARIS"
-        ? "DIREKTUR"
-        : user.id;
+      const initialHolder = user.id;
 
       const doc = await prisma.suratMasuk.create({
         data: {
