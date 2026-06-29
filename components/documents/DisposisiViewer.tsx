@@ -44,7 +44,7 @@ export function DisposisiViewer({ disposisi, doc, actions }: DisposisiViewerProp
     const selected = disposisi.jabatanKe.toLowerCase();
     const cleanItem = item.toLowerCase();
     
-    if (cleanItem.includes("adum") && (selected.includes("adum") || selected.includes("keuangan") || selected.includes("administrasi"))) return true;
+    if (cleanItem.includes("admin") && (selected.includes("admin") || selected.includes("adum") || selected.includes("keuangan") || selected.includes("administrasi"))) return true;
     if (cleanItem.includes("teknik") && selected.includes("teknik")) return true;
     if (cleanItem.includes("hublang") && (selected.includes("hublang") || selected.includes("hubungan langganan"))) return true;
     if (cleanItem.includes("spi") && selected.includes("spi")) return true;
@@ -55,7 +55,7 @@ export function DisposisiViewer({ disposisi, doc, actions }: DisposisiViewerProp
   };
 
   const standardItems = [
-    "Kabag Adum dan Keu",
+    "Kabag Admin dan Keu",
     "Kabag Teknik",
     "Kabag Hublang",
     "Kepala SPI",
@@ -134,8 +134,13 @@ export function DisposisiViewer({ disposisi, doc, actions }: DisposisiViewerProp
                             : "border-transparent text-gray-700"}`}>
                           {num}
                         </span>
-                        <span className={active ? "text-blue-600" : "text-gray-700"}>
+                        <span className={active ? "text-blue-600 font-bold" : "text-gray-700"}>
                           {item}
+                          {active && disposisi.ke?.name && (
+                            <span className="ml-1.5 text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full font-medium">
+                              {disposisi.ke.name}
+                            </span>
+                          )}
                         </span>
                       </div>
                     );

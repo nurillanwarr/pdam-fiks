@@ -34,11 +34,13 @@ function BuatSuratContent() {
     nomorSurat: "",
     perihal: "",
     deskripsi: "",
-    tujuan: "",
     asalSurat: "",
     tanggalSurat: new Date().toISOString().split("T")[0],
     documentType: preselectedType || ("SURAT_MASUK" as DocumentType),
     category: "DLL" as DocumentCategory,
+    nomorAgenda: "",
+    tanggalTerima: new Date().toISOString().split("T")[0],
+    tanggalPenyelesaian: "",
   });
 
   const [undangan, setUndangan] = useState({
@@ -61,6 +63,7 @@ function BuatSuratContent() {
   const [loading, setLoading] = useState(false);
   const [createdDocId, setCreatedDocId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [isFileUploaded, setIsFileUploaded] = useState(false);
 
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {};
@@ -101,8 +104,9 @@ function BuatSuratContent() {
       // Clean up empty strings so Zod .optional() works properly
       if (!payload.nomorSurat) delete payload.nomorSurat;
       if (!payload.deskripsi) delete payload.deskripsi;
-      if (!payload.tujuan) delete payload.tujuan;
       if (!payload.asalSurat) delete payload.asalSurat;
+      if (!payload.nomorAgenda) delete payload.nomorAgenda;
+      if (!payload.tanggalPenyelesaian) delete payload.tanggalPenyelesaian;
 
       const res = await fetch("/api/documents", {
         method: "POST",
@@ -128,8 +132,8 @@ function BuatSuratContent() {
       // So this "Proses Dokumen" is just redirecting them back to dashboard, 
       // or calling a submit API if needed. Since it's already created, 
       // they just want to go back to dashboard.
-      toast.success("Dokumen siap diproses lebih lanjut!");
-      router.push("/dashboard/admin");
+      toast.success("Dokumen siap diproses oleh Direktur");
+      router.push(`/dashboard/admin/arsip/${createdDocId}`);
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : "Terjadi kesalahan.");
     } finally {
@@ -243,17 +247,29 @@ function BuatSuratContent() {
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="form-label">Tujuan Surat</label>
+            <label className="form-label">Nomor Agenda <span className="text-red-500">*</span></label>
             <input
-              className="form-input"
-              placeholder="Contoh: Direktur Utama PDAM"
-              // Jika jenis surat UNDANGAN, otomatis isi degnan "Direktur Utama PDAM"
-              value={form.documentType === "UNDANGAN" ? "Direktur Utama PDAM" : form.tujuan}
-              onChange={set("tujuan")}
-              // Disable input tujuan jika dokumen sudah dibuat / jika jenisnya UNDANGAN
-              disabled={!!createdDocId || form.documentType === "UNDANGAN"}
+              className="form-input font-mono"
+              placeholder="Contoh: 120/AGD/2026"
+              value={form.nomorAgenda}
+              onChange={set("nomorAgenda")}
+              disabled={!!createdDocId}
+              type="text"
             />
           </div>
+          <div>
+            <label className="form-label">Tanggal Terima <span className="text-red-500">*</span></label>
+            <input
+              type="date"
+              className="form-input"
+              value={form.tanggalTerima}
+              onChange={set("tanggalTerima")}
+              disabled={!!createdDocId}
+            />
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="form-label">Asal Surat</label>
             <input
@@ -262,6 +278,16 @@ function BuatSuratContent() {
               value={form.asalSurat}
               onChange={set("asalSurat")}
               disabled={!!createdDocId}
+            />
+          </div>
+          <div>
+            <label className="form-label">Target Tanggal Penyelesaian</label>
+            <input
+              type="date"
+              className="form-input"
+              value={form.tanggalPenyelesaian}
+              onChange={set("tanggalPenyelesaian")}
+              disabled={!!createdDocId} 
             />
           </div>
         </div>
@@ -439,6 +465,7 @@ function BuatSuratContent() {
             documentId={createdDocId}
             fileType="FINAL_SCAN" // Agendaris usually uploads FINAL_SCAN or DRAFT, let's use FINAL_SCAN since they are admin
             label="File Scan Dokumen"
+            onSuccess={() => setIsFileUploaded(true)}
           />
         </FadeIn>
       )}
@@ -448,22 +475,29 @@ function BuatSuratContent() {
         <FadeIn delay={0.4} className="card p-6 bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
           <h2 className="font-semibold text-gray-900 dark:text-white mb-2">4. Selesai</h2>
           <p className="text-sm text-gray-600 dark:text-slate-400 mb-4">
-            File dokumen telah di-upload. Anda dapat kembali ke Dashboard.
+            File dokumen wajib di-upload untuk dapat menyelesaikan proses disposisi.
           </p>
-          <div className="flex gap-3">
-            <Link 
-              href={`/dashboard/admin/arsip/${createdDocId}`}
-              className="btn-secondary flex-1 justify-center"
-            >
-              Lihat Detail
-            </Link>
-            <button
-              onClick={handleSubmitForReview}
-              disabled={submitting}
-              className="btn-primary flex-1 justify-center"
-            >
-              <Send className="w-4 h-4" /> Selesai & Kembali
-            </button>
+          <div className="flex flex-col gap-3">
+            {!isFileUploaded && (
+              <p className="text-xs text-red-500 font-semibold animate-pulse">
+                * Harap unggah file dokumen terlebih dahulu sebelum menyelesaikan.
+              </p>
+            )}
+            <div className="flex gap-3">
+              <Link
+                href={`/dashboard/admin/arsip/${createdDocId}`}
+                className="btn-secondary flex-1 justify-center"
+              >
+                Lihat Detail
+              </Link>
+              <button
+                onClick={handleSubmitForReview}
+                disabled={submitting || !isFileUploaded}
+                className="btn-primary flex-1 justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Send className="w-4 h-4" /> Selesai & Teruskan ke Direktur
+              </button>
+            </div>
           </div>
         </FadeIn>
       )}

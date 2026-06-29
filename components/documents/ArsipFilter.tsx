@@ -52,7 +52,16 @@ export function ArsipFilter() {
           <option key={y} value={String(y)}>{y}</option>
         ))}
       </select>
-      {(bulan || tahun) && (
+      <select
+        value={params.get("prioritas") ?? ""}
+        onChange={(e) => update("prioritas", e.target.value)}
+        className="form-input py-1.5 text-sm w-32"
+      >
+        <option value="">Semua Prioritas</option>
+        <option value="true">Penting</option>
+        <option value="false">Normal</option>
+      </select>
+      {(bulan || tahun || params.get("prioritas")) && (
         <button
           onClick={() => router.push("?")}
           className="text-xs text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 underline"

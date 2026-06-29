@@ -92,7 +92,7 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      const { nomorSurat: rawNomor, perihal, deskripsi, tujuan, asalSurat, tanggalSurat, documentType, category } = parsed.data;
+      const { nomorSurat: rawNomor, perihal, deskripsi, tujuan, asalSurat, tanggalSurat, documentType, category, nomorAgenda, tanggalTerima, tanggalPenyelesaian } = parsed.data;
 
       // Extract undangan fields from raw body (not in createDocumentSchema)
       const undanganData = body.undangan as {
@@ -113,25 +113,31 @@ export async function POST(req: NextRequest) {
         return errorResponse(`Nomor surat "${nomorSurat}" sudah ada dalam sistem.`, 409);
       }
 
-      // Agendaris membuat surat: langsung status MENUNGGU_REVIEW_AGENDARIS (atau DRAFT)
+      // Agendaris membuat surat: langsung status MENUNGGU_KEPUTUSAN_DIREKTUR
       // Staff membuat surat: status DRAFT
       const initialStatus = user.role === "AGENDARIS" 
-        ? "MENUNGGU_REVIEW_AGENDARIS" 
+        ? "MENUNGGU_KEPUTUSAN_DIREKTUR" 
         : "DRAFT";
+
+      const initialHolder = user.role === "AGENDARIS"
+        ? "DIREKTUR"
+        : user.id;
 
       const doc = await prisma.suratMasuk.create({
         data: {
           nomorSurat,
           perihal,
           deskripsi,
-          tujuan,
           asalSurat,
           tanggalSurat: new Date(tanggalSurat),
           currentStatus: initialStatus,
           createdById: user.id,
-          currentHolder: user.id,
+          currentHolder: initialHolder,
           documentType: documentType ?? "SURAT_MASUK",
           category: category ?? "DLL",
+          nomorAgenda: nomorAgenda || null,
+          tanggalTerima: tanggalTerima ? new Date(tanggalTerima) : new Date(),
+          tanggalPenyelesaian: tanggalPenyelesaian ? new Date(tanggalPenyelesaian) : null,
         },
         include: {
           createdBy: { select: { id: true, name: true, divisi: true } },

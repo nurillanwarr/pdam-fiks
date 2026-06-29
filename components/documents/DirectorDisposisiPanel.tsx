@@ -96,7 +96,12 @@ export function DirectorDisposisiPanel({ docId, existingDisposisi }: DirectorDis
       newErrors.tanggalInstruksi = "Tanggal instruksi wajib diisi.";
     }
 
-    const finalInstruksi = "";
+    const lines = [
+      ...selectedInstruksi.map(i => `- ${i}`),
+      ...(customInstruksi.trim() ? [customInstruksi.trim()] : [])
+    ];
+    
+    const finalInstruksi = lines.join("\n");
 
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) {

@@ -104,7 +104,6 @@ export default async function StaffDocumentDetail(props: Params) {
               <InfoRow icon={FileText} label="Nomor Surat" value={doc.nomorSurat} mono />
               <InfoRow icon={Calendar} label="Tanggal Surat"
                 value={format(new Date(doc.tanggalSurat), "dd MMMM yyyy", { locale: localeId })} />
-              <InfoRow icon={Building} label="Tujuan" value={doc.tujuan ?? "-"} />
               <InfoRow icon={User} label="Pembuat"
                 value={`${doc.createdBy.name} (${doc.createdBy.divisi ?? "-"})`} />
             </div>

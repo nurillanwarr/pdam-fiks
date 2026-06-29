@@ -689,24 +689,7 @@ export function AgendarisActionPanel({
         <p className="text-sm text-emerald-700 dark:text-emerald-400">
           Direktur telah memberikan keputusan. Karena sistem tidak lagi menggunakan staff admin, silakan simpan dokumen ini ke arsip.
         </p>
-        <div className="flex gap-2">
-          {(!doc.documentType || doc.documentType === "SURAT_MASUK") ? (
-            <a
-              href={`/dashboard/admin/arsip/${doc.id}/cetak-gabungan`}
-              target="_blank"
-              className="btn-secondary bg-white text-emerald-700 border-emerald-300 hover:bg-emerald-100 flex-1 justify-center"
-            >
-              <Clock className="w-4 h-4" /> Cetak Berkas Gabungan
-            </a>
-          ) : (
-            <a
-              href={doc.files?.[0]?.filePath ?? "#"}
-              target="_blank"
-              className="btn-secondary bg-white text-emerald-700 border-emerald-300 hover:bg-emerald-100 flex-1 justify-center"
-            >
-              <FileText className="w-4 h-4" /> Lihat Dokumen
-            </a>
-          )}
+        <div className="flex flex-col gap-2">
           <button
             onClick={async () => {
               setLoading(true);

@@ -41,6 +41,7 @@ export function DocumentTable({
         <thead>
           <tr>
             <th className="table-th rounded-tl-xl">No. Surat</th>
+            <th className="table-th">No. Agenda</th>
             <th className="table-th">Perihal</th>
             {showCreator && <th className="table-th">Dari</th>}
             {showDocType && <th className="table-th">Jenis</th>}
@@ -55,11 +56,11 @@ export function DocumentTable({
               <td className="table-td font-mono text-sm font-medium text-blue-700 dark:text-blue-400 whitespace-nowrap">
                 {doc.nomorSurat}
               </td>
+              <td className="table-td font-mono text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                {doc.nomorAgenda ?? "-"}
+              </td>
               <td className="table-td max-w-xs">
                 <p className="truncate font-medium text-gray-900 dark:text-white">{doc.perihal}</p>
-                {doc.tujuan && (
-                  <p className="text-sm text-gray-400 dark:text-slate-500 truncate mt-0.5">Kepada: {doc.tujuan}</p>
-                )}
               </td>
               {showCreator && (
                 <td className="table-td whitespace-nowrap">

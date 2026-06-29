@@ -47,6 +47,7 @@ export interface UserSession extends UserPayload {
 export interface DocumentListItem {
   id: string;
   nomorSurat: string;
+  nomorAgenda?: string | null;
   perihal: string;
   tujuan?: string | null;
   asalSurat: string | null;

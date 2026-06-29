@@ -102,6 +102,9 @@ export default function AdminArsipDetailClient({ doc, staffUsers }: {
               <InfoRow icon={FileText} label="Nomor Surat" value={doc.nomorSurat} mono />
               <InfoRow icon={Calendar} label="Tanggal Surat"
                 value={format(new Date(doc.tanggalSurat), "dd MMMM yyyy", { locale: localeId })} />
+              <InfoRow icon={FileText} label="Nomor Agenda" value={doc.nomorAgenda ?? "-"} mono />
+              <InfoRow icon={Calendar} label="Tanggal Terima"
+                value={doc.tanggalTerima ? format(new Date(doc.tanggalTerima), "dd MMMM yyyy", { locale: localeId }) : "-"} />
               <InfoRow icon={User} label="Pembuat"
                 value={`${doc.createdBy.name} (${doc.createdBy.divisi ?? "-"})`} />
               <InfoRow icon={User} label="Email" value={doc.createdBy.email ?? "-"} />
@@ -137,31 +140,6 @@ export default function AdminArsipDetailClient({ doc, staffUsers }: {
                 >
                   <Calendar className="w-3.5 h-3.5" /> Tambahkan ke Google Calendar
                 </a>
-                <button 
-                  type="button"
-                  onClick={() => {
-                    const u = doc.undangan;
-                    if (!u) return;
-                    const template = 
-                      `🔔 *PEMBERITAHUAN JADWAL KEGIATAN* 🔔\n\n` +
-                      `Yth. Bapak/Ibu,\n` +
-                      `Mengingatkan bahwa terdapat agenda kegiatan yang perlu dihadiri:\n\n` +
-                      `📌 *Agenda:*\n${doc.perihal || ""}\n\n` +
-                      `✉️ *Terkait Surat:*\n${doc.nomorSurat}\n\n` +
-                      `🗓️ *Waktu Pelaksanaan:*\n` +
-                      `• Hari, Tanggal: ${u.hari}, ${format(new Date(u.tanggal), 'dd MMMM yyyy', { locale: localeId })}\n` +
-                      `• Pukul: ${u.jam} WIB\n\n` +
-                      `📍 *Lokasi/Media:*\n${u.tempat} (${u.media})\n\n` +
-                      `📝 *Pakaian/Dresscode:*\n${u.dresscode ? u.dresscode : '-'}\n\n` +
-                      `Dimohon kehadirannya tepat waktu.\nTerima kasih. 🙏`;
-                    
-                    setWaReminderText(template);
-                    setShowWaModal(true);
-                  }}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-slate-800 border border-emerald-200 dark:border-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 rounded-lg text-xs font-medium cursor-pointer transition-colors"
-                >
-                  <MessageCircle className="w-3.5 h-3.5" /> Share WhatsApp
-                </button>
               </div>
             </div>
           )}
@@ -267,60 +245,8 @@ export default function AdminArsipDetailClient({ doc, staffUsers }: {
         <EditDokumenModal doc={doc} onClose={() => setShowEditModal(false)} />
       )}
 
-      {showWaModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
-          <div className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl shadow-2xl w-full max-w-xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-            {/* Header Modal */}
-            <div className="px-5 py-4 border-b border-gray-100 dark:border-slate-800 flex items-center justify-between bg-emerald-50/50 dark:bg-emerald-950/10">
-              <div className="flex items-center gap-2">
-                <MessageCircle className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-                <h3 className="font-bold text-gray-900 dark:text-white text-base">Kustomisasi Pengingat WhatsApp</h3>
-              </div>
-              <button 
-                onClick={() => setShowWaModal(false)}
-                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-sm font-bold p-1"
-              >
-                ✕
-              </button>
-            </div>
 
-            {/* Area Editor Teks */}
-            <div className="p-5 flex-1 space-y-4">
-              <p className="text-xs text-gray-500 dark:text-slate-400">
-                Silakan edit pesan pengingat di bawah ini secara bebas. Karakter khusus seperti <strong className="text-emerald-600">*tebal*</strong> tetap didukung di WhatsApp.
-              </p>
-              <textarea
-                value={waReminderText}
-                onChange={(e) => setWaReminderText(e.target.value)}
-                rows={12}
-                className="w-full p-4 border-2 border-gray-200 dark:border-slate-700 rounded-xl bg-gray-50 dark:bg-slate-850 text-gray-800 dark:text-slate-100 font-mono text-xs focus:border-emerald-500 focus:bg-white dark:focus:bg-slate-900 outline-none transition-all resize-none leading-relaxed"
-                placeholder="Tulis pesan pengingat Anda disini..."
-              />
-            </div>
 
-            {/* Tombol Aksi */}
-            <div className="px-5 py-4 border-t border-gray-100 dark:border-slate-800 flex justify-end gap-3 bg-gray-50 dark:bg-slate-900/50">
-              <button
-                type="button"
-                onClick={() => setShowWaModal(false)}
-                className="btn-secondary text-xs px-4 py-2"
-              >
-                Batal
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  window.open(`https://wa.me/?text=${encodeURIComponent(waReminderText)}`, "_blank");
-                  setShowWaModal(false);
-                }}
-                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-emerald-500/20 active:scale-[0.98] flex items-center gap-1.5"
-              >
-                <MessageCircle className="w-4 h-4" /> Kirim WhatsApp
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

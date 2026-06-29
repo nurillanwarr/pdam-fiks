@@ -212,20 +212,6 @@ export default async function AdminDashboard() {
                 const addGuestsParam = guestEmails ? `&add=${encodeURIComponent(guestEmails)}` : '';
                 const gcalLink = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${gcalTitle}&details=${gcalDetails}&location=${gcalLocation}&dates=${dateStr}T010000Z/${dateStr}T030000Z${addGuestsParam}`;
 
-                const waText = encodeURIComponent(
-                  `🔔 *PEMBERITAHUAN JADWAL KEGIATAN* 🔔\n\n` +
-                  `Yth. Bapak/Ibu,\n` +
-                  `Mengingatkan bahwa terdapat agenda kegiatan yang perlu dihadiri:\n\n` +
-                  `📌 *Agenda:*\n${undangan.suratMasuk.perihal}\n\n` +
-                  `✉️ *Terkait Surat:*\n${undangan.suratMasuk.nomorSurat}\n\n` +
-                  `🗓️ *Waktu Pelaksanaan:*\n` +
-                  `• Hari, Tanggal: ${undangan.hari}, ${format(new Date(undangan.tanggal), 'dd MMMM yyyy', { locale: localeId })}\n` +
-                  `• Pukul: ${undangan.jam} WIB\n\n` +
-                  `📍 *Lokasi/Media:*\n${undangan.tempat} (${undangan.media})\n\n` +
-                  `📝 *Pakaian/Dresscode:*\n${undangan.dresscode ? undangan.dresscode : '-'}\n\n` +
-                  `Dimohon kehadirannya tepat waktu.\nTerima kasih. 🙏`
-                );
-                const waLink = `https://wa.me/?text=${waText}`;
 
                 return (
                   <div key={undangan.id} className="flex items-start gap-3 px-5 py-3">
@@ -241,9 +227,6 @@ export default async function AdminDashboard() {
                       <div className="flex gap-2 mt-2">
                         <a href={gcalLink} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 px-2 py-1 bg-white border border-gray-200 hover:bg-gray-50 text-gray-600 rounded text-[10px] font-medium transition-colors">
                           <CalendarIcon className="w-3 h-3 text-blue-500" /> Google Calendar
-                        </a>
-                        <a href={waLink} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 px-2 py-1 bg-white border border-gray-200 hover:bg-emerald-50 text-gray-600 rounded text-[10px] font-medium transition-colors">
-                          <MessageCircle className="w-3 h-3 text-emerald-500" /> Share WhatsApp
                         </a>
                       </div>
                     </div>

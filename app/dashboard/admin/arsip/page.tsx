@@ -12,13 +12,13 @@ import { ArsipFilter } from "@/components/documents/ArsipFilter";
 import { Suspense } from "react";
 import { FadeIn } from "@/components/ui/FadeIn";
 
-type Props = { searchParams: Promise<{ bulan?: string; tahun?: string }> };
+type Props = { searchParams: Promise<{ bulan?: string; tahun?: string; prioritas?: string }> };
 
 export default async function AdminArsipPage({ searchParams }: Props) {
   const session = await getServerSession(authOptions);
   if (!session || session.user.role !== "AGENDARIS") redirect("/dashboard");
 
-  const { bulan, tahun } = await searchParams;
+  const { bulan, tahun, prioritas } = await searchParams;
   const bulanNum = bulan ? parseInt(bulan) : undefined;
   const tahunNum = tahun ? parseInt(tahun) : undefined;
 
@@ -45,6 +45,7 @@ export default async function AdminArsipPage({ searchParams }: Props) {
       where: {
         currentStatus: "ARSIP_FINAL_TERSIMPAN",
         ...(Object.keys(archiveFilter).length > 0 ? { archive: archiveFilter } : {}),
+        ...(prioritas === "true" ? { isImportant: true } : prioritas === "false" ? { isImportant: false } : {}),
       },
       include: {
         createdBy: { select: { name: true, divisi: true } },
@@ -126,7 +127,12 @@ export default async function AdminArsipPage({ searchParams }: Props) {
                       {doc.nomorSurat}
                     </td>
                     <td className="table-td max-w-xs">
-                      <p className="font-medium truncate">{doc.perihal}</p>
+                      <div className="flex items-center gap-2">
+                        <p className="font-medium truncate">{doc.perihal}</p>
+                        {doc.isImportant && (
+                          <span className="px-1.5 py-0.5 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 text-[10px] font-bold rounded">PENTING</span>
+                        )}
+                      </div>
                     </td>
                     <td className="table-td whitespace-nowrap">
                       <p className="font-medium">{doc.createdBy.name}</p>
@@ -211,7 +217,12 @@ export default async function AdminArsipPage({ searchParams }: Props) {
                     <tr key={doc.id} className="hover:bg-gray-50 dark:hover:bg-slate-800/50">
                       <td className="table-td font-mono text-xs text-blue-700 dark:text-blue-400">{doc.nomorSurat}</td>
                       <td className="table-td max-w-xs">
-                        <p className="truncate font-medium">{doc.perihal}</p>
+                        <div className="flex items-center gap-2">
+                          <p className="truncate font-medium">{doc.perihal}</p>
+                          {doc.isImportant && (
+                            <span className="px-1.5 py-0.5 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 text-[10px] font-bold rounded">PENTING</span>
+                          )}
+                        </div>
                       </td>
                       <td className="table-td">{doc.createdBy.name}</td>
                       <td className="table-td whitespace-nowrap text-gray-500 dark:text-gray-400">

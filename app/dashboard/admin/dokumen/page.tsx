@@ -15,8 +15,8 @@ const PAGE_SIZE = 15;
 
 // Tab configuration with icons and colors
 const TABS: { key: string; label: string; icon: string; documentType?: DocumentType; color: string; darkColor: string }[] = [
-  { key: "SEMUA",              label: "Semua",              icon: "layers",   color: "bg-blue-600",    darkColor: "dark:bg-blue-500" },
-  { key: "UNDANGAN",           label: "Undangan",           icon: "calendar", documentType: "UNDANGAN",           color: "bg-purple-600",  darkColor: "dark:bg-purple-500" },
+  { key: "SEMUA",             label: "Semua",              icon: "layers",                                       color: "bg-blue-600",    darkColor: "dark:bg-blue-500" },
+  { key: "UNDANGAN",          label: "Undangan",           icon: "calendar", documentType: "UNDANGAN",           color: "bg-purple-600",  darkColor: "dark:bg-purple-500" },
   { key: "SURAT_MASUK",       label: "Surat Masuk",        icon: "mailopen", documentType: "SURAT_MASUK",        color: "bg-blue-600",    darkColor: "dark:bg-blue-500" },
   { key: "SURAT_TUGAS",       label: "Surat Tugas",        icon: "briefcase",documentType: "SURAT_TUGAS",        color: "bg-amber-600",   darkColor: "dark:bg-amber-500" },
   { key: "SURAT_KELUAR",      label: "Surat Keluar",       icon: "send",     documentType: "SURAT_KELUAR",       color: "bg-emerald-600", darkColor: "dark:bg-emerald-500" },

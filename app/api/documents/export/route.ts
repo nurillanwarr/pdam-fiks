@@ -48,6 +48,10 @@ export async function GET(req: NextRequest) {
             take: 1,
             select: { decisionType: true, decisionNote: true, director: { select: { name: true } } }
           },
+          disposisi: {
+            include: { ke: { select: { name: true, divisi: true, role: true } } },
+            orderBy: { createdAt: "asc" }
+          },
           archive: { select: { serverLocation: true, archivedAt: true } }
         },
         orderBy: { updatedAt: "desc" }
@@ -78,6 +82,7 @@ export async function GET(req: NextRequest) {
       if (documentType !== "SURAT_MASUK") {
         headers.push("KETERANGAN");
       }
+      headers.push("INSTRUKSI DISPOSISI", "PENERIMA DISPOSISI");
 
       const headerRow = worksheet.addRow(headers);
       headerRow.font = { bold: true };
@@ -132,6 +137,31 @@ export async function GET(req: NextRequest) {
           rowValues.push(keterangan);
         }
 
+        // Aggregate instruksi & penerima
+        const allInstruksi: string[] = [];
+        const allPenerima: string[] = [];
+        
+        if (doc.decisions && doc.decisions.length > 0) {
+          const d = doc.decisions[0];
+          if (d.decisionNote) allInstruksi.push(`[Direktur]: ${d.decisionNote}`);
+        }
+        
+        if (doc.disposisi && (doc as any).disposisi.length > 0) {
+          (doc as any).disposisi.forEach((disp: any) => {
+            if (disp.instruksi && disp.ke) allInstruksi.push(`[${disp.ke.role}]: ${disp.instruksi}`);
+            else if (disp.instruksi) allInstruksi.push(disp.instruksi);
+            
+            if (disp.ke) {
+              allPenerima.push(disp.ke.name + (disp.ke.divisi ? ` (${disp.ke.divisi})` : ""));
+            } else if (disp.jabatanKe) {
+              allPenerima.push(disp.jabatanKe);
+            }
+          });
+        }
+        
+        rowValues.push(allInstruksi.length > 0 ? allInstruksi.join("\n") : "-");
+        rowValues.push(allPenerima.length > 0 ? Array.from(new Set(allPenerima)).join(", ") : "-");
+
         const row = worksheet.addRow(rowValues);
 
         row.alignment = { vertical: 'top', wrapText: true };
@@ -154,9 +184,13 @@ export async function GET(req: NextRequest) {
       worksheet.getColumn(6).width = 25; // ASAL SURAT
       worksheet.getColumn(7).width = 40; // PERIHAL
 
+      let nextCol = 8;
       if (documentType !== "SURAT_MASUK") {
-        worksheet.getColumn(8).width = 50; // KETERANGAN
+        worksheet.getColumn(nextCol).width = 50; // KETERANGAN
+        nextCol++;
       }
+      worksheet.getColumn(nextCol).width = 40; // INSTRUKSI
+      worksheet.getColumn(nextCol + 1).width = 30; // PENERIMA
 
       const buffer = await workbook.xlsx.writeBuffer();
       const filename = `Laporan_Dokumen_${format(new Date(), "yyyyMMdd_HHmmss")}.xlsx`;

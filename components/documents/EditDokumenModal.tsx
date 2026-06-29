@@ -136,15 +136,7 @@ export function EditDokumenModal({ doc, onClose }: { doc: any; onClose: () => vo
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="form-label">Tujuan Surat</label>
-              <input
-                className="form-input"
-                value={form.tujuan}
-                onChange={(e) => setForm({ ...form, tujuan: e.target.value })}
-              />
-            </div>
-            <div>
+            <div className="col-span-2">
               <label className="form-label">Asal Surat</label>
               <input
                 className="form-input"

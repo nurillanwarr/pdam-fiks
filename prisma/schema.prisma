@@ -164,6 +164,7 @@ model SuratMasuk {
   currentStatus DocumentStatus   @default(DRAFT) @map("current_status")
   currentHolder String?          @map("current_holder")
   category      DocumentCategory @default(DLL)
+  isImportant   Boolean          @default(false) @map("is_important")
   isVisible     Boolean          @default(true) @map("is_visible")
   createdById   String           @map("created_by")
   createdAt     DateTime         @default(now()) @map("created_at")

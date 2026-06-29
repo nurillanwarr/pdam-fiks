@@ -62,6 +62,13 @@ export const createDocumentSchema = z.object({
     "UNDANGAN", "PEMBELIAN", "KERJASAMA", "KEPEGAWAIAN",
     "KEUANGAN", "PERIZINAN", "PENGADAAN", "HUKUM", "TEKNIK", "DLL",
   ]).optional().default("DLL"),
+  nomorAgenda: z.string().max(100).optional().or(z.literal("")),
+  tanggalTerima: z.string().refine((d) => !d || !isNaN(Date.parse(d)), {
+    message: "Format tanggal terima tidak valid",
+  }).optional().or(z.literal("")),
+  tanggalPenyelesaian: z.string().refine((d) => !d || !isNaN(Date.parse(d)), {
+    message: "Format tanggal penyelesaian tidak valid",
+  }).optional().or(z.literal("")),
 });
 
 export const updateDocumentSchema = createDocumentSchema.partial();

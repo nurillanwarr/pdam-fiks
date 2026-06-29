@@ -49,11 +49,6 @@ const navByRole: Record<UserRole, NavEntry[]> = {
       children: [
         { label: "Undangan", href: "/dashboard/admin/undangan", icon: Calendar },
         { label: "Surat Masuk", href: "/dashboard/admin/surat-masuk", icon: MailOpen },
-        // { label: "Surat Tugas", href: "/dashboard/admin/surat-tugas", icon: Briefcase },
-        // { label: "Surat Keluar", href: "/dashboard/admin/surat-keluar", icon: Send },
-        // { label: "SK Direktur", href: "/dashboard/admin/sk-direktur", icon: Award },
-        // { label: "Perjanjian", href: "/dashboard/admin/perjanjian", icon: Handshake },
-        // { label: "Peraturan Direktur", href: "/dashboard/admin/peraturan", icon: ScrollText },
       ],
     },
     { label: "Progres Disposisi", href: "/dashboard/admin/dokumen", icon: BookOpen },
