@@ -1,7 +1,8 @@
 // components/ui/ConfirmModal.tsx
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { AlertTriangle, Info, X, Trash2, RotateCcw } from "lucide-react";
 
 interface ConfirmModalProps {
@@ -27,6 +28,12 @@ export function ConfirmModal({
   type = "warning",
   isLoading = false,
 }: ConfirmModalProps) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
@@ -38,7 +45,7 @@ export function ConfirmModal({
     };
   }, [isOpen]);
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted) return null;
 
   const getTheme = () => {
     switch (type) {
@@ -69,8 +76,8 @@ export function ConfirmModal({
 
   const theme = getTheme();
 
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+  const modalContent = (
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
       {/* Backdrop */}
       <div 
         className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity animate-in fade-in duration-200"
@@ -128,4 +135,6 @@ export function ConfirmModal({
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 }
