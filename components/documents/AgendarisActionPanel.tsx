@@ -90,6 +90,7 @@ export function AgendarisActionPanel({
   const [editTanggalTerima, setEditTanggalTerima] = useState(toDateInput(doc.tanggalTerima));
   const [editAsalSurat, setEditAsalSurat] = useState(doc.asalSurat ?? "");
   const [editNomorAgenda, setEditNomorAgenda] = useState(doc.nomorAgenda ?? "");
+  const [editCategory, setEditCategory] = useState(doc.category ?? "DLL");
   const [editTanggalPenyelesaian, setEditTanggalPenyelesaian] = useState("");
   const [showTarikModal, setShowTarikModal] = useState(false);
 
