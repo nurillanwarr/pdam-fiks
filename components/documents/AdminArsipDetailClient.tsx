@@ -13,6 +13,7 @@ import { id as localeId } from "date-fns/locale";
 import { ArrowLeft, FileText, Download, Calendar, User, Printer, Eye, Pencil, Trash2, Clock, Users, MessageCircle } from "lucide-react";
 import toast from "react-hot-toast";
 import { StatusBadge } from "@/components/ui/StatusBadge";
+import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { StatusTimeline } from "@/components/documents/StatusTimeline";
 import { AdminArchivePanel } from "@/components/documents/AdminArchivePanel";
 import { AgendarisActionPanel } from "@/components/documents/AgendarisActionPanel";
@@ -37,6 +38,7 @@ export default function AdminArsipDetailClient({ doc, staffUsers }: {
   const [showEditModal, setShowEditModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [showWaModal, setShowWaModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [waReminderText, setWaReminderText] = useState("");
 
   // Tentukan back url yang sesuai
@@ -45,7 +47,6 @@ export default function AdminArsipDetailClient({ doc, staffUsers }: {
     : "/dashboard/admin/arsip";
 
   const handleDelete = async () => {
-    if (!confirm("Apakah Anda yakin ingin menghapus dokumen ini secara permanen? Aksi ini tidak dapat dibatalkan.")) return;
     setIsDeleting(true);
     try {
       const res = await fetch(`/api/documents/${doc.id}`, { method: "DELETE" });
@@ -79,12 +80,23 @@ export default function AdminArsipDetailClient({ doc, staffUsers }: {
             <Pencil className="w-4 h-4" /> Edit
           </button>
           <button
-            onClick={handleDelete}
+            onClick={() => setShowDeleteModal(true)}
             disabled={isDeleting}
             className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-red-700 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 dark:bg-red-900/30 dark:border-red-800 dark:text-red-300 dark:hover:bg-red-900/50 transition-colors"
           >
             <Trash2 className="w-4 h-4" /> {isDeleting ? "Menghapus..." : "Hapus"}
           </button>
+          
+          <ConfirmModal
+            isOpen={showDeleteModal}
+            onClose={() => setShowDeleteModal(false)}
+            onConfirm={handleDelete}
+            title="Hapus Dokumen"
+            message="Apakah Anda yakin ingin menghapus dokumen ini secara permanen? Aksi ini tidak dapat dibatalkan."
+            confirmText="Hapus Permanen"
+            type="danger"
+            isLoading={isDeleting}
+          />
         </div>
       </div>
 

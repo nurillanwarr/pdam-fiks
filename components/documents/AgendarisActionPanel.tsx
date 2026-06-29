@@ -11,6 +11,7 @@ import toast from "react-hot-toast";
 import { Send, RotateCcw, Bell, Loader2, GitBranch, Clock, Archive, FileText } from "lucide-react";
 import { format } from "date-fns";
 import { id as localeId } from "date-fns/locale";
+import { ConfirmModal } from "@/components/ui/ConfirmModal";
 
 interface StaffUser { id: string; name: string; divisi: string | null }
 interface DocProps {
@@ -89,8 +90,8 @@ export function AgendarisActionPanel({
   const [editTanggalTerima, setEditTanggalTerima] = useState(toDateInput(doc.tanggalTerima));
   const [editAsalSurat, setEditAsalSurat] = useState(doc.asalSurat ?? "");
   const [editNomorAgenda, setEditNomorAgenda] = useState(doc.nomorAgenda ?? "");
-  const [editCategory, setEditCategory] = useState(doc.category ?? "DLL");
   const [editTanggalPenyelesaian, setEditTanggalPenyelesaian] = useState("");
+  const [showTarikModal, setShowTarikModal] = useState(false);
 
   // States for Undangan
   const [uHari, setUHari] = useState(doc.undangan?.hari ?? "");
@@ -749,28 +750,40 @@ export function AgendarisActionPanel({
           </button>
           
           {doc.currentStatus === "MENUNGGU_KEPUTUSAN_DIREKTUR" && (
-            <button
-              onClick={async () => {
-                if (!confirm("Yakin ingin menarik dokumen ini? Direktur tidak akan bisa memprosesnya sampai Anda meneruskannya kembali.")) return;
-                setLoading(true);
-                try {
-                  const res = await fetch(`/api/documents/${doc.id}/pullback`, { method: "POST" });
-                  const json = await res.json();
-                  if (!res.ok) throw new Error(json.error ?? "Gagal");
-                  toast.success("Dokumen berhasil ditarik!");
-                  router.refresh();
-                } catch (e: unknown) {
-                  toast.error(e instanceof Error ? e.message : "Gagal menarik dokumen");
-                } finally { setLoading(false); }
-              }}
-              disabled={loading}
-              className="btn-secondary flex-1 justify-center text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
-            >
-              <RotateCcw className="w-4 h-4 mr-1" /> Tarik Dokumen
-            </button>
+            <>
+              <button
+                onClick={() => setShowTarikModal(true)}
+                disabled={loading}
+                className="btn-secondary flex-1 justify-center text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+              >
+                <RotateCcw className="w-4 h-4 mr-1" /> Tarik Dokumen
+              </button>
+              
+              <ConfirmModal
+                isOpen={showTarikModal}
+                onClose={() => setShowTarikModal(false)}
+                onConfirm={async () => {
+                  setLoading(true);
+                  try {
+                    const res = await fetch(`/api/documents/${doc.id}/pullback`, { method: "POST" });
+                    const json = await res.json();
+                    if (!res.ok) throw new Error(json.error ?? "Gagal");
+                    toast.success("Dokumen berhasil ditarik!");
+                    setShowTarikModal(false);
+                    router.refresh();
+                  } catch (e: unknown) {
+                    toast.error(e instanceof Error ? e.message : "Gagal menarik dokumen");
+                  } finally { setLoading(false); }
+                }}
+                title="Tarik Dokumen"
+                message="Yakin ingin menarik dokumen ini? Direktur tidak akan bisa memprosesnya sampai Anda meneruskannya kembali."
+                confirmText="Tarik Dokumen"
+                type="warning"
+                isLoading={loading}
+              />
+            </>
           )}
         </div>
-      </div>
     );
   }
 
