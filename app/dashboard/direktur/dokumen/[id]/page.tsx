@@ -12,6 +12,7 @@ import { StatusTimeline } from "@/components/documents/StatusTimeline";
 import { DirectorDecisionPanel } from "@/components/documents/DirectorDecisionPanel";
 import { DirectorDisposisiPanel } from "@/components/documents/DirectorDisposisiPanel";
 import { FileListViewer } from "@/components/documents/FileListViewer";
+import { DirectorPullbackButton } from "@/components/documents/DirectorPullbackButton";
 import { DECISION_LABELS } from "@/types";
 import { DecisionType } from "@prisma/client";
 import { UndanganDetail } from "@/components/documents/UndanganDetail";
@@ -74,8 +75,9 @@ export default async function DirektuurDocumentDetail(props: Params) {
     doc.currentStatus = "DIPROSES_DIREKTUR";
   }
 
-  // Direktur hanya bisa proses dokumen yang menunggu keputusannya
-  const canDecide = ["MENUNGGU_KEPUTUSAN_DIREKTUR", "DIPROSES_DIREKTUR"].includes(doc.currentStatus);
+  // Direktur hanya bisa proses dokumen yang menunggu keputusannya,
+  // dan bisa mengubah keputusannya (edit) saat statusnya masih KEPUTUSAN_DIREKTUR_SELESAI
+  const canDecide = ["MENUNGGU_KEPUTUSAN_DIREKTUR", "DIPROSES_DIREKTUR", "KEPUTUSAN_DIREKTUR_SELESAI"].includes(doc.currentStatus);
   const latestDisposisi = (doc as typeof doc & { disposisi?: { id: string; jabatanKe: string | null; instruksi: string | null; keterangan: string | null; tanggalTandaTangan: Date | null }[] }).disposisi?.[0] ?? null;
 
   return (
@@ -122,6 +124,9 @@ export default async function DirektuurDocumentDetail(props: Params) {
                 </p>
               </div>
             )}
+
+            {/* Tombol Tarik/Batalkan Keputusan untuk Direktur */}
+            <DirectorPullbackButton docId={doc.id} currentStatus={doc.currentStatus} />
           </div>
 
           {doc.documentType === "UNDANGAN" && doc.undangan && (

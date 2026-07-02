@@ -216,7 +216,7 @@ export async function POST(req: NextRequest, props: Params) {
       const doc = await prisma.suratMasuk.findUnique({ where: { id: params.id } });
       if (!doc) return errorResponse("Dokumen tidak ditemukan.", 404);
 
-      const validStatuses = ["MENUNGGU_KEPUTUSAN_DIREKTUR", "DIPROSES_DIREKTUR"];
+      const validStatuses = ["MENUNGGU_KEPUTUSAN_DIREKTUR", "DIPROSES_DIREKTUR", "KEPUTUSAN_DIREKTUR_SELESAI"];
       if (!validStatuses.includes(doc.currentStatus)) {
         return errorResponse("Dokumen tidak dalam tahap keputusan Direktur.", 400);
       }
