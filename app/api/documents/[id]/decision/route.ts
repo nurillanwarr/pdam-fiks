@@ -35,12 +35,16 @@ export async function POST(req: NextRequest, props: Params) {
       });
       if (!doc) return errorResponse("Dokumen tidak ditemukan.", 404);
 
-      const validStatuses = ["MENUNGGU_KEPUTUSAN_DIREKTUR", "DIPROSES_DIREKTUR"];
+      const validStatuses = ["MENUNGGU_KEPUTUSAN_DIREKTUR", "DIPROSES_DIREKTUR", "KEPUTUSAN_DIREKTUR_SELESAI"];
       if (!validStatuses.includes(doc.currentStatus)) {
         return errorResponse(
           `Dokumen tidak dalam tahap keputusan Direktur. Status: ${doc.currentStatus}`,
           400
         );
+      }
+
+      if (!decisionNote || decisionNote.trim() === "") {
+        return errorResponse("Catatan / Instruksi wajib diisi.", 422);
       }
 
       const prevStatus = doc.currentStatus;
@@ -109,17 +113,30 @@ export async function POST(req: NextRequest, props: Params) {
       }
 
       // Record ke database
+      // Cek apakah sudah ada decision sebelumnya
+      const existingDecision = await prisma.directorDecision.findFirst({
+        where: { suratMasukId: doc.id },
+        orderBy: { decidedAt: "desc" }
+      });
+
+      const decisionData = {
+        suratMasukId: doc.id,
+        directorId: user.id,
+        decisionType,
+        decisionNote,
+        tanggalInstruksi: new Date(tanggalInstruksi),
+        batalTandaTangan: batalTandaTangan ?? false,
+      };
+
       const [decision, updatedDoc] = await prisma.$transaction([
-        prisma.directorDecision.create({
-          data: {
-            suratMasukId: doc.id,
-            directorId: user.id,
-            decisionType,
-            decisionNote,
-            tanggalInstruksi: new Date(tanggalInstruksi),
-            batalTandaTangan: batalTandaTangan ?? false,
-          },
-        }),
+        existingDecision 
+          ? prisma.directorDecision.update({
+              where: { id: existingDecision.id },
+              data: decisionData,
+            })
+          : prisma.directorDecision.create({
+              data: decisionData,
+            }),
         prisma.suratMasuk.update({
           where: { id: doc.id },
           data: {

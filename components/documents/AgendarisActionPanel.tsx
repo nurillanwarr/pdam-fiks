@@ -77,6 +77,8 @@ export function AgendarisActionPanel({
 
   // Kembalikan state
   const [revisiNote, setRevisiNote] = useState("");
+  const [returnToDirectorNote, setReturnToDirectorNote] = useState("");
+  const [showReturnToDirectorModal, setShowReturnToDirectorModal] = useState(false);
 
   // Disposisi state — dihapus (Agendaris tidak mengisi disposisi kepada/instruksi)
   // Hanya meneruskan dokumen ke Direktur
@@ -689,7 +691,60 @@ export function AgendarisActionPanel({
           >
             {loading ? "Menyimpan..." : <><Archive className="w-4 h-4" /> Simpan ke Arsip</>}
           </button>
+          
+          <button
+            onClick={() => setShowReturnToDirectorModal(true)}
+            disabled={loading}
+            className="btn-secondary text-red-600 border-red-200 hover:bg-red-50 flex-1 justify-center"
+          >
+            <RotateCcw className="w-4 h-4" /> Kembalikan ke Direktur
+          </button>
         </div>
+
+        {/* Modal Kembalikan ke Direktur */}
+        <ConfirmModal
+          isOpen={showReturnToDirectorModal}
+          onClose={() => setShowReturnToDirectorModal(false)}
+          onConfirm={async () => {
+            if (!returnToDirectorNote.trim()) {
+              toast.error("Catatan wajib diisi.");
+              return;
+            }
+            setLoading(true);
+            try {
+              const res = await fetch(`/api/documents/${doc.id}/return-to-director`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ note: returnToDirectorNote }),
+              });
+              const json = await res.json();
+              if (!res.ok) throw new Error(json.error ?? "Gagal mengembalikan.");
+              toast.success("Dokumen berhasil dikembalikan ke Direktur!");
+              setShowReturnToDirectorModal(false);
+              router.refresh();
+            } catch (err: unknown) {
+              toast.error(err instanceof Error ? err.message : "Terjadi kesalahan.");
+            } finally {
+              setLoading(false);
+            }
+          }}
+          title="Kembalikan ke Direktur"
+          message={
+            <div className="space-y-3 mt-2 text-left">
+              <p className="text-sm text-gray-600">Dokumen akan dikembalikan ke status Menunggu Keputusan Direktur. Silakan isi catatan alasannya:</p>
+              <textarea
+                className="form-input w-full resize-none text-sm"
+                rows={3}
+                placeholder="Catatan untuk Direktur..."
+                value={returnToDirectorNote}
+                onChange={(e) => setReturnToDirectorNote(e.target.value)}
+              />
+            </div>
+          }
+          confirmText="Kembalikan Dokumen"
+          type="warning"
+          isLoading={loading}
+        />
       </div>
     );
   }

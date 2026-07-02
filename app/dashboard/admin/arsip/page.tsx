@@ -11,6 +11,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { ArsipFilter } from "@/components/documents/ArsipFilter";
 import { Suspense } from "react";
 import { FadeIn } from "@/components/ui/FadeIn";
+import { BatchArchiveButton } from "@/components/documents/BatchArchiveButton";
 
 type Props = { searchParams: Promise<{ bulan?: string; tahun?: string; prioritas?: string }> };
 
@@ -97,6 +98,9 @@ export default async function AdminArsipPage({ searchParams }: Props) {
               </span>
             )}
           </div>
+          {antrianDocs.length > 0 && (
+            <BatchArchiveButton documentIds={antrianDocs.map(d => d.id)} />
+          )}
         </div>
 
         {antrianDocs.length === 0 ? (

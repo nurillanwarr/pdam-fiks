@@ -21,12 +21,17 @@ export default async function CetakDisposisi(props: Params) {
         orderBy: { createdAt: "desc" },
         take: 1,
       },
+      decisions: {
+        orderBy: { decidedAt: "desc" },
+        take: 1,
+      },
     },
   });
 
   if (!doc) notFound();
 
   const latestDisposisi = doc.disposisi?.[0] ?? null;
+  const latestDecision = doc.decisions?.[0] ?? null;
   
   const ROLE_LABELS: Record<string, string> = {
     ADMIN_STAFF: "Admin Staff",
@@ -98,6 +103,7 @@ export default async function CetakDisposisi(props: Params) {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
             <PrintField label="Tanggal Surat" value={format(new Date(doc.tanggalSurat), "dd MMMM yyyy", { locale: localeId })} />
             <PrintField label="Asal Surat" value={doc.asalSurat ?? "-"} />
+            <PrintField label="Tujuan" value={doc.tujuan ?? "-"} />
             <PrintField label="Perihal" value={doc.perihal} />
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
@@ -151,6 +157,15 @@ export default async function CetakDisposisi(props: Params) {
                 <p style={{ fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '14px', fontSize: '13px' }}>Isi Instruksi/Informasi :</p>
                 <p style={{ whiteSpace: 'pre-wrap', lineHeight: 1.6, fontSize: '16px', fontWeight: 'bold', color: '#1d4ed8', padding: '0 4px' }}>
                   {latestDisposisi?.instruksi ?? "-"}
+                </p>
+              </div>
+
+              {/* Keputusan Direktur */}
+              <div style={{ marginTop: '20px' }}>
+                <p style={{ fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '14px', fontSize: '13px' }}>Keputusan Direktur :</p>
+                <p style={{ whiteSpace: 'pre-wrap', lineHeight: 1.6, fontSize: '16px', fontWeight: 'bold', color: '#1d4ed8', padding: '0 4px' }}>
+                  {latestDecision?.decisionType ?? "-"}
+                  {latestDecision?.decisionNote ? `\nCatatan: ${latestDecision.decisionNote}` : ""}
                 </p>
               </div>
             </div>

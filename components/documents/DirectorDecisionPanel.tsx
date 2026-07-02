@@ -14,6 +14,9 @@ import { DECISION_LABELS } from "@/types";
 
 interface DocProps { id: string; currentStatus: string; }
 
+// Tambahkan "KEPUTUSAN_DIREKTUR_SELESAI" agar Direktur bisa mengubah keputusan yang sudah dikirim
+const VALID_STATUSES = ["MENUNGGU_KEPUTUSAN_DIREKTUR", "DIPROSES_DIREKTUR", "KEPUTUSAN_DIREKTUR_SELESAI"];
+
 const DECISION_OPTIONS: { type: DecisionType; label: string; icon: React.ElementType; cls: string }[] = [
   { type: "DISETUJUI", label: "Disetujui — Kembalikan ke Agendaris", icon: CheckCircle, cls: "btn-success" },
   { type: "REVISI",    label: "Minta Revisi",                         icon: RotateCcw,   cls: "bg-yellow-600 hover:bg-yellow-700 text-white inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg disabled:opacity-50 transition-colors" },
@@ -29,9 +32,11 @@ export function DirectorDecisionPanel({ doc }: { doc: DocProps }) {
   const [tanggalInstruksi, setTanggalInstruksi] = useState(
     new Date().toISOString().split("T")[0]
   );
+  const [decisionNote, setDecisionNote] = useState("");
   const [instruksiError, setInstruksiError] = useState("");
+  const [noteError, setNoteError] = useState("");
 
-  if (!["MENUNGGU_KEPUTUSAN_DIREKTUR", "DIPROSES_DIREKTUR"].includes(doc.currentStatus)) {
+  if (!VALID_STATUSES.includes(doc.currentStatus)) {
     return null;
   }
 
@@ -39,12 +44,25 @@ export function DirectorDecisionPanel({ doc }: { doc: DocProps }) {
     if (!selected) { toast.error("Pilih jenis keputusan terlebih dahulu."); return; }
     
     // Validate tanggal instruksi
+    let hasError = false;
     if (!tanggalInstruksi) {
       setInstruksiError("Tanggal instruksi wajib diisi.");
-      toast.error("Tanggal instruksi wajib diisi.");
+      hasError = true;
+    } else {
+      setInstruksiError("");
+    }
+
+    if (!decisionNote.trim()) {
+      setNoteError("Instruksi / Catatan wajib diisi.");
+      hasError = true;
+    } else {
+      setNoteError("");
+    }
+
+    if (hasError) {
+      toast.error("Harap lengkapi form sebelum mengirim keputusan.");
       return;
     }
-    setInstruksiError("");
 
     setLoading(true);
     try {
@@ -53,6 +71,7 @@ export function DirectorDecisionPanel({ doc }: { doc: DocProps }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
           decisionType: selected, 
+          decisionNote,
           autoSign: batalTandaTangan ? false : autoSign,
           tanggalInstruksi,
           batalTandaTangan,
@@ -71,7 +90,9 @@ export function DirectorDecisionPanel({ doc }: { doc: DocProps }) {
 
   return (
     <div className="card p-5 space-y-4">
-      <h3 className="font-semibold text-gray-900 dark:text-white">Berikan Keputusan</h3>
+      <h3 className="font-semibold text-gray-900 dark:text-white">
+        {doc.currentStatus === "KEPUTUSAN_DIREKTUR_SELESAI" ? "Ubah Keputusan" : "Berikan Keputusan"}
+      </h3>
 
       {/* Tanggal Instruksi — WAJIB */}
       <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4 space-y-2">
@@ -117,6 +138,22 @@ export function DirectorDecisionPanel({ doc }: { doc: DocProps }) {
             </button>
           );
         })}
+      </div>
+
+      {/* Input Instruksi / Catatan */}
+      <div className="space-y-1.5 mt-2">
+        <label className="form-label font-medium text-gray-700 dark:text-gray-300">
+          Catatan / Instruksi <span className="text-red-500">*</span>
+        </label>
+        <textarea
+          className={`form-input w-full resize-none ${noteError ? "border-red-400" : ""}`}
+          rows={3}
+          placeholder="Tuliskan catatan atau instruksi keputusan..."
+          value={decisionNote}
+          onChange={(e) => { setDecisionNote(e.target.value); setNoteError(""); }}
+          disabled={loading}
+        />
+        {noteError && <p className="text-xs text-red-600">{noteError}</p>}
       </div>
 
       {/* Selected indicator & Auto Sign / Batal TTD */}
@@ -178,7 +215,7 @@ export function DirectorDecisionPanel({ doc }: { doc: DocProps }) {
       >
         {loading
           ? <><Loader2 className="w-4 h-4 animate-spin" /> Menyimpan Keputusan...</>
-          : "Simpan & Kembalikan ke Agendaris"}
+          : doc.currentStatus === "KEPUTUSAN_DIREKTUR_SELESAI" ? "Perbarui & Simpan Keputusan" : "Simpan & Kembalikan ke Agendaris"}
       </button>
     </div>
   );
