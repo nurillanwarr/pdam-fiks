@@ -1,7 +1,7 @@
 // components/ui/ConfirmModal.tsx
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { AlertTriangle, Info, X, Trash2, RotateCcw } from "lucide-react";
 
@@ -10,7 +10,7 @@ interface ConfirmModalProps {
   onClose: () => void;
   onConfirm: () => void;
   title: string;
-  message: string | React.ReactNode;
+  message: string | ReactNode;
   confirmText?: string;
   cancelText?: string;
   type?: "danger" | "warning" | "info";
