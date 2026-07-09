@@ -129,7 +129,7 @@ export function Sidebar({ role, userName, isOpen = false, onClose }: Props) {
       className={cn(
         "print:hidden",
         "bg-blue-900 dark:bg-slate-950 text-white flex flex-col shrink-0 z-40 transition-transform duration-300 ease-in-out border-r border-blue-800 dark:border-slate-900",
-        /* Desktop: collapsable */
+        /* Desktop: selalu lebar penuh */
         "md:relative md:translate-x-0 md:w-64",
         /* Mobile: fixed overlay */
         "fixed inset-y-0 left-0 w-64",
@@ -142,7 +142,7 @@ export function Sidebar({ role, userName, isOpen = false, onClose }: Props) {
           <div className="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center shrink-0">
             <FileText className="w-5 h-5 shrink-0" />
           </div>
-          <div className="flex-1 min-w-[140px] transition-opacity duration-300 md:opacity-0 md:group-hover:opacity-100">
+          <div className="flex-1 min-w-[140px] transition-opacity duration-300">
             <p className="font-bold text-base leading-tight truncate">SIPAS PDAM</p>
             <p className="text-sm text-blue-300 leading-tight truncate">Arsip Digital</p>
           </div>
@@ -158,13 +158,8 @@ export function Sidebar({ role, userName, isOpen = false, onClose }: Props) {
 
       {/* User info */}
       <div className="px-5 py-4 border-b border-blue-800 dark:border-slate-900 flex items-center h-[90px] box-border relative overflow-hidden">
-        {/* Collapsed Avatar (Desktop only) */}
-        <div className="hidden md:flex group-hover:md:hidden absolute left-1/2 -translate-x-1/2 w-10 h-10 bg-blue-800 rounded-full items-center justify-center shrink-0 overflow-hidden border border-blue-700">
-          {/* Try to get image from a prop or session if needed, but since Sidebar is a server/client hybrid, I'll use a placeholder or initials for now unless I pass image down. */}
-          <span className="font-bold text-sm">{userName.charAt(0).toUpperCase()}</span>
-        </div>
         {/* Full User Info */}
-        <div className="flex-1 min-w-[180px] transition-opacity duration-300 md:opacity-0 md:group-hover:opacity-100">
+        <div className="flex-1 min-w-[180px] transition-opacity duration-300">
           <p className="text-sm text-blue-400 mb-1">Login sebagai</p>
           <p className="font-semibold text-base leading-tight truncate">{userName}</p>
           <span className="inline-block mt-1 text-sm bg-blue-700 px-2 py-0.5 rounded-full text-blue-100 truncate">
@@ -204,7 +199,7 @@ export function Sidebar({ role, userName, isOpen = false, onClose }: Props) {
               title={entry.label}
             >
               <Icon className="w-5 h-5 shrink-0" />
-              <span className="whitespace-nowrap transition-opacity duration-300 md:opacity-0 md:group-hover:opacity-100">
+              <span className="whitespace-nowrap transition-opacity duration-300">
                 {entry.label}
               </span>
             </Link>
@@ -251,12 +246,12 @@ function NavGroupItem({
         title={group.label}
       >
         <Icon className="w-5 h-5 shrink-0" />
-        <span className="whitespace-nowrap flex-1 text-left transition-opacity duration-300 md:opacity-0 md:group-hover:opacity-100">
+        <span className="whitespace-nowrap flex-1 text-left transition-opacity duration-300">
           {group.label}
         </span>
         <ChevronDown
           className={cn(
-            "w-4 h-4 shrink-0 transition-transform duration-200 md:opacity-0 md:group-hover:opacity-100",
+            "w-4 h-4 shrink-0 transition-transform duration-200",
             open ? "rotate-180" : "rotate-0"
           )}
         />
@@ -266,7 +261,6 @@ function NavGroupItem({
       <div
         className={cn(
           "overflow-hidden transition-all duration-200 ease-in-out",
-          "md:hidden md:group-hover:block",
           open ? "max-h-96 opacity-100 mt-1" : "max-h-0 opacity-0"
         )}
       >
@@ -288,7 +282,7 @@ function NavGroupItem({
                 title={child.label}
               >
                 <ChildIcon className="w-4 h-4 shrink-0" />
-                <span className="whitespace-nowrap transition-opacity duration-300 md:opacity-0 md:group-hover:opacity-100">
+                <span className="whitespace-nowrap transition-opacity duration-300">
                   {child.label}
                 </span>
               </Link>
