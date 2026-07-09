@@ -127,10 +127,10 @@ export function Sidebar({ role, userName, isOpen = false, onClose }: Props) {
   return (
     <aside
       className={cn(
-        "print:hidden group",
-        "bg-blue-900 dark:bg-slate-950 text-white flex flex-col shrink-0 z-40 transition-[width,transform] duration-300 ease-in-out border-r border-blue-800 dark:border-slate-900",
+        "print:hidden",
+        "bg-blue-900 dark:bg-slate-950 text-white flex flex-col shrink-0 z-40 transition-transform duration-300 ease-in-out border-r border-blue-800 dark:border-slate-900",
         /* Desktop: collapsable */
-        "md:relative md:translate-x-0 md:w-20 md:hover:w-64",
+        "md:relative md:translate-x-0 md:w-64",
         /* Mobile: fixed overlay */
         "fixed inset-y-0 left-0 w-64",
         isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
