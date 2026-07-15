@@ -78,9 +78,9 @@ export default async function AdminDashboard() {
           <Link href="/dashboard/admin/users" className="btn-secondary">
             <Users className="w-4 h-4" /> Kelola User
           </Link>
-          <Link href="/dashboard/admin/arsip" className="btn-primary">
+          {/* <Link href="/dashboard/admin/arsip" className="btn-primary">
             <Archive className="w-4 h-4" /> Arsip ({menungguArsip})
-          </Link>
+          </Link> */}
         </div>
       </div>
 
